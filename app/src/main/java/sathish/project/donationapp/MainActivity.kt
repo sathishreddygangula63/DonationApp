@@ -119,6 +119,6 @@ fun LoadingScreenPreview() {
 }
 
 fun gotoSignInActivity(context: Activity) {
-//    context.startActivity(Intent(context, SignInActivity::class.java))
-//    context.finish()
+    context.startActivity(Intent(context, SignInActivity::class.java))
+    context.finish()
 }
