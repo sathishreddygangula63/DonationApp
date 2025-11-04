@@ -105,6 +105,17 @@ fun LoadingScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
 
+            Text(
+                text = "By Satish Reddy",
+                color = colorResource(id = R.color.black),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(bottom = 6.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
 
         }
     }
