@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "113972816537",
+    "project_id": "donationapp-5d743",
+    "storage_bucket": "donationapp-5d743.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113972816537:android:f385b4541ad94005c2a608",
+        "android_client_info": {
+          "package_name": "sathish.project.donationapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRoKKVfl3fiPeRqNzX_UkwLGkgYTqUNFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

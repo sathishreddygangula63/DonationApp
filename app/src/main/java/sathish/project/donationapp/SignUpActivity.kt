@@ -1,8 +1,10 @@
 package sathish.project.donationapp
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -43,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.FirebaseDatabase
+import kotlin.math.sign
 
 
 class SignUpActivity : ComponentActivity() {
@@ -59,9 +63,9 @@ class SignUpActivity : ComponentActivity() {
 @Composable
 fun SetupAccountActivityScreen() {
     var donorFullName by remember { mutableStateOf("") }
+    var donorContact by remember { mutableStateOf("") }
     var donorEmail by remember { mutableStateOf("") }
     var donorPassword by remember { mutableStateOf("") }
-    var donorConfirmPassword by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -129,6 +133,35 @@ fun SetupAccountActivityScreen() {
                 }
             }
         )
+
+        BasicTextField(
+            value = donorContact,
+            onValueChange = { donorContact = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .height(50.dp),
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            decorationBox = { innerTextField ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(Color.LightGray, MaterialTheme.shapes.medium)
+                        .padding(horizontal = 16.dp)
+                        .fillMaxSize()
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (donorContact.isEmpty()) {
+                            Text(text = "Contact", color = Color.Gray)
+                        }
+                        innerTextField()
+                    }
+
+                }
+            }
+        )
+
         BasicTextField(
             value = donorEmail,
             onValueChange = { donorEmail = it },
@@ -181,43 +214,48 @@ fun SetupAccountActivityScreen() {
             }
         )
 
-        BasicTextField(
-            value = donorConfirmPassword,
-            onValueChange = { donorConfirmPassword = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .height(50.dp),
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            decorationBox = { innerTextField ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(Color.LightGray, MaterialTheme.shapes.medium)
-                        .padding(horizontal = 16.dp)
-                        .fillMaxSize()
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (donorConfirmPassword.isEmpty()) {
-                            Text(text = "Confirm Password", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
-
-                }
-            }
-        )
-
-
-
-
 
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { /* Handle Login */ },
+            onClick = {
+                when {
+                    donorFullName.isEmpty() -> {
+                        Toast.makeText(context, " Please Enter Name", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    donorContact.isEmpty() -> {
+                        Toast.makeText(context, " Please Enter Contact", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    donorEmail.isEmpty() -> {
+                        Toast.makeText(context, " Please Enter Email", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    donorPassword.isEmpty() -> {
+                        Toast.makeText(
+                            context,
+                            " Please Enter Password",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    else -> {
+                        val donorDetails = DonorAccountDetails(
+                            name = donorFullName,
+                            contact = donorContact,
+                            emailid = donorEmail,
+                            password = donorPassword
+                        )
+                        signUpDonor(donorDetails, context)
+                    }
+
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -254,3 +292,40 @@ fun SetupAccountActivityScreen() {
 fun SetupAccountActivityScreenPreview() {
     SetupAccountActivityScreen()
 }
+
+
+fun signUpDonor(donorAccountDetails: DonorAccountDetails, context: Context) {
+
+    val firebaseDatabase = FirebaseDatabase.getInstance()
+    val databaseReference = firebaseDatabase.getReference("DonorAccounts")
+
+    databaseReference.child(donorAccountDetails.emailid.replace(".", ","))
+        .setValue(donorAccountDetails)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(context, "You Registered Successfully", Toast.LENGTH_SHORT)
+                    .show()
+
+            } else {
+                Toast.makeText(
+                    context,
+                    "Registration Failed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        .addOnFailureListener { _ ->
+            Toast.makeText(
+                context,
+                "Something went wrong",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+}
+
+data class DonorAccountDetails(
+    var name: String = "",
+    var emailid: String = "",
+    var contact: String = "",
+    var password: String = ""
+)

@@ -1,8 +1,10 @@
 package sathish.project.donationapp
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -49,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.FirebaseDatabase
 import sathish.project.donationapp.ui.theme.DonationAppTheme
+import kotlin.jvm.java
 
 
 class SignInActivity : ComponentActivity() {
@@ -185,6 +189,14 @@ fun AccountAccessActivityScreen() {
                     else -> {
                         errorMessage = ""
 
+                        val donorDetails = DonorAccountDetails(
+                            name = "",
+                            contact = "",
+                            emailid = email,
+                            password = password
+                        )
+                        signUpDonor(donorDetails, context)
+
                     }
                 }
             },
@@ -226,4 +238,35 @@ fun AccountAccessActivityScreen() {
 @Composable
 fun AccountAccessActivityScreenPreview() {
     AccountAccessActivityScreen()
+}
+
+fun signInUser(donorAccountDetails: DonorAccountDetails, context: Context) {
+
+    val firebaseDatabase = FirebaseDatabase.getInstance()
+    val databaseReference = firebaseDatabase.getReference("DonorAccounts").child(donorAccountDetails.emailid.replace(".", ","))
+
+    databaseReference.get().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val donorData = task.result?.getValue(DonorAccountDetails::class.java)
+            if (donorData != null) {
+                if (donorData.password == donorAccountDetails.password) {
+
+                    Toast.makeText(context, "Login Successfully", Toast.LENGTH_SHORT).show()
+//                    context.startActivity(Intent(context, FacultyHomeActivity::class.java))
+
+                } else {
+                    Toast.makeText(context, "Seems Incorrect Credentials", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "Your account not found", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(
+                context,
+                "Something went wrong",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+    }
 }
