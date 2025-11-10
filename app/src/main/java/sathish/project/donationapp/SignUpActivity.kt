@@ -278,7 +278,7 @@ fun SetupAccountActivityScreen() {
                 text = " Login",
                 color = Color(0xFF5D3FD3),
                 modifier = Modifier.clickable {
-                    context.startActivity(Intent(context, SignUpActivity::class.java))
+                    context.startActivity(Intent(context, SignInActivity::class.java))
                     context.finish()
                 },
                 style = MaterialTheme.typography.titleMedium
@@ -305,6 +305,8 @@ fun signUpDonor(donorAccountDetails: DonorAccountDetails, context: Context) {
             if (task.isSuccessful) {
                 Toast.makeText(context, "You Registered Successfully", Toast.LENGTH_SHORT)
                     .show()
+                context.startActivity(Intent(context, SignInActivity::class.java))
+                (context as Activity).finish()
 
             } else {
                 Toast.makeText(
