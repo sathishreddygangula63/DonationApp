@@ -10,4 +10,6 @@
 
     <color name="SkyBlue">#8AAAE5</color>
     <color name="PureWhite">#FFFFFF</color>
+
+    <color name="white_50">#80FFFFFF</color>
 </resources>
