@@ -1,6 +1,10 @@
 package sathish.project.donationapp
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
@@ -28,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,10 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlin.jvm.java
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent {
+            HomeScreen()
+        }
     }
 }
 
@@ -48,7 +57,7 @@ class HomeActivity : AppCompatActivity() {
 @Composable
 fun HomeScreen() {
 
-//    val context = LocalContext.current as Activity
+    val context = LocalContext.current as Activity
 
     Column(
         modifier = Modifier
@@ -90,67 +99,51 @@ fun HomeScreen() {
                 modifier = Modifier
                     .size(42.dp)
                     .clickable {
-                        // Navigate to LoginActivity when clicked
-//                        TravelGuideDetails.saveTravelguideuserStatus(context, false)
 
-//                        val intent = Intent(context, SignInActivity::class.java)
-//                        context.startActivity(intent)
-
-
-//                        context.finish()
                     }
                     .padding(start = 8.dp) // Optional spacing // Optional spacin
             )
         }
 
-        TravelGuide(
+        Donation(
             bgImage = R.drawable.live_campaign,
             title = "Live Campaign",
             onClick = {
-//                context.startActivity(Intent(context, DestinationSearchActivity::class.java))
+                context.startActivity(Intent(context, LiveCampaignActivity::class.java))
             }
         )
 
-        TravelGuide(
+        Donation(
             bgImage = R.drawable.donation_center,
             title = "Donation center",
             onClick = {
-//                context.startActivity(Intent(context, TransportSearchActivity::class.java))
+//                context.startActivity(Intent(context, ::class.java))
             }
         )
-        TravelGuide(
+        Donation(
             bgImage = R.drawable.my_donation,
             title = "My Donation",
             onClick = {
-//                context.startActivity(Intent(context, ReviewActivity::class.java))
+//                context.startActivity(Intent(context, ::class.java))
 
             }
         )
 
-        TravelGuide(
+        Donation(
             bgImage = R.drawable.my_profile,
             title = "My Profile",
             onClick = {
-//                context.startActivity(Intent(context, ReviewActivity::class.java))
+//                context.startActivity(Intent(context, ::class.java))
 
             }
         )
-
-//        TravelGuide(
-//            bgImage = R.drawable.cu,
-//            title = "Contact Us",
-//            onClick = {
-//
-//            }
-//        )
-
 
     }
 }
 
 
 @Composable
-fun TravelGuide(bgImage: Int, title: String, onClick: (title: String) -> Unit) {
+fun Donation(bgImage: Int, title: String, onClick: (title: String) -> Unit) {
 
     Card(
         modifier = Modifier
