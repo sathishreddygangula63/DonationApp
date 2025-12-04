@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.database.FirebaseDatabase
+import kotlin.jvm.java
 
 
 class SignInActivity : ComponentActivity() {
@@ -235,7 +236,7 @@ fun signInUser(donorAccountDetails: DonorAccountDetails, context: Context) {
                 if (donorData.password == donorAccountDetails.password) {
 
                     Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
-//                    context.startActivity(Intent(context, FacultyHomeActivity::class.java))
+                    context.startActivity(Intent(context, HomeActivity::class.java))
 
                 } else {
                     Toast.makeText(context, "Seems Incorrect Credentials", Toast.LENGTH_SHORT).show()
