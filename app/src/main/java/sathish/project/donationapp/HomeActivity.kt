@@ -94,15 +94,6 @@ fun HomeScreen() {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Image(painter = painterResource(id = R.drawable.check_out),
-                contentDescription = "Logout",
-                modifier = Modifier
-                    .size(42.dp)
-                    .clickable {
-
-                    }
-                    .padding(start = 8.dp) // Optional spacing // Optional spacin
-            )
         }
 
         Donation(
@@ -117,14 +108,17 @@ fun HomeScreen() {
             bgImage = R.drawable.donation_center,
             title = "Donation center",
             onClick = {
-//                context.startActivity(Intent(context, ::class.java))
+                val intent = Intent(context, LocateDonationCentersActivity::class.java)
+                context.startActivity(intent)
+
             }
         )
         Donation(
             bgImage = R.drawable.my_donation,
             title = "My Donation",
             onClick = {
-//                context.startActivity(Intent(context, ::class.java))
+                val intent = Intent(context, DonationsListActivity::class.java)
+                context.startActivity(intent)
 
             }
         )
@@ -133,7 +127,7 @@ fun HomeScreen() {
             bgImage = R.drawable.my_profile,
             title = "My Profile",
             onClick = {
-//                context.startActivity(Intent(context, ::class.java))
+                context.startActivity(Intent(context, ProfileActivity::class.java))
 
             }
         )

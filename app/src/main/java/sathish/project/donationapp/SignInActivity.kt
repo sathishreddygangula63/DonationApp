@@ -235,6 +235,13 @@ fun signInUser(donorAccountDetails: DonorAccountDetails, context: Context) {
             if (donorData != null) {
                 if (donorData.password == donorAccountDetails.password) {
 
+                    UserPrefs.markLoginStatus(context, true)
+                    UserPrefs.saveEmail(
+                        context,
+                        email = donorData.emailid
+                    )
+                    UserPrefs.saveName(context, donorData.name)
+
                     Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
                     context.startActivity(Intent(context, HomeActivity::class.java))
 

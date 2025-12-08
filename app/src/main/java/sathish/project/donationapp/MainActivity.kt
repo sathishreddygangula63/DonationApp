@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import sathish.project.donationapp.ui.theme.DonationAppTheme
+import kotlin.jvm.java
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,25 +41,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DonationAppTheme {
-                LoadingScreenCheck(::isUserLoggedIn)
+                LoadingScreenCheck()
             }
         }
     }
 
-    private fun isUserLoggedIn(value: Int) {
-
-        when (value) {
-            2 -> {
-                gotoSignInActivity(this)
-            }
-
-        }
-    }
 }
 
 @Composable
-fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
+fun LoadingScreenCheck() {
     var splashValue by remember { mutableStateOf(true) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(3000)
@@ -67,7 +62,14 @@ fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
     if (splashValue) {
         LoadingScreen()
     } else {
-        isUserLoggedIn.invoke(2)
+
+        if (UserPrefs.checkLoginStatus(context)) {
+            context.startActivity(Intent(context, HomeActivity::class.java))
+            (context as Activity).finish()
+        } else {
+            context.startActivity(Intent(context, SignInActivity::class.java))
+            (context as Activity).finish()
+        }
     }
 }
 
