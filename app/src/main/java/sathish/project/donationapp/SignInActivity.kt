@@ -21,8 +21,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,9 +64,11 @@ class SignInActivity : ComponentActivity() {
 fun AccountAccessActivityScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf("") }
+
+
 
 
     val context = LocalContext.current as Activity
@@ -139,7 +146,10 @@ fun AccountAccessActivityScreen() {
                 .padding(vertical = 8.dp)
                 .height(50.dp),
             singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation(),
             decorationBox = { innerTextField ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -148,13 +158,34 @@ fun AccountAccessActivityScreen() {
                         .padding(horizontal = 16.dp)
                         .fillMaxSize()
                 ) {
+
+                    // ===== Text Field =====
                     Box(modifier = Modifier.weight(1f)) {
                         if (password.isEmpty()) {
-                            Text(text = "Password", color = Color.Gray)
+                            Text(
+                                text = "Password",
+                                color = Color.Gray
+                            )
                         }
                         innerTextField()
                     }
 
+                    // ===== Visibility Toggle Icon =====
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible }
+                    ) {
+                        Icon(
+                            imageVector = if (passwordVisible)
+                                Icons.Default.Visibility
+                            else
+                                Icons.Default.VisibilityOff,
+                            contentDescription = if (passwordVisible)
+                                "Hide password"
+                            else
+                                "Show password",
+                            tint = Color.DarkGray
+                        )
+                    }
                 }
             }
         )
