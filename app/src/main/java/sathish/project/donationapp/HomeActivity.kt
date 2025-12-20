@@ -23,10 +23,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,84 +62,117 @@ class HomeActivity : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
 
     val context = LocalContext.current as Activity
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = colorResource(id = R.color.SkyBlue))
-                .padding(vertical = 6.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.icon_donation),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .width(36.dp)
-                    .height(36.dp)
-                    .clickable {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Donation App",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {}) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_donation),
+                            contentDescription = "Logo",
+                            modifier = Modifier
+                                .width(36.dp)
+                                .height(36.dp)
+                                .clickable {
+                                }
+                        )
                     }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.SkyBlue)
+                )
+            )
+        }
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+        ) {
+
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .background(color = colorResource(id = R.color.SkyBlue))
+//                    .padding(vertical = 6.dp, horizontal = 16.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Image(
+//                    painter = painterResource(id = R.drawable.icon_donation),
+//                    contentDescription = "Logo",
+//                    modifier = Modifier
+//                        .width(36.dp)
+//                        .height(36.dp)
+//                        .clickable {
+//                        }
+//                )
+//
+//                Spacer(modifier = Modifier.width(16.dp))
+//
+//                Text(
+//                    text = "Donation App",
+//                    style = MaterialTheme.typography.titleLarge,
+//                    color = Color.Black,
+//                    fontWeight = FontWeight.Bold
+//                )
+//                Spacer(modifier = Modifier.weight(1f))
+//
+//                Spacer(modifier = Modifier.width(8.dp))
+//
+//            }
+
+            Donation(
+                bgImage = R.drawable.live_campaign,
+                title = "Live Campaign",
+                onClick = {
+                    context.startActivity(Intent(context, LiveCampaignActivity::class.java))
+                }
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Donation(
+                bgImage = R.drawable.donation_center,
+                title = "Donation center",
+                onClick = {
+                    val intent = Intent(context, LocateDonationCentersActivity::class.java)
+                    context.startActivity(intent)
 
-            Text(
-                text = "Donation App",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
+                }
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Donation(
+                bgImage = R.drawable.my_donation,
+                title = "My Donation",
+                onClick = {
+                    val intent = Intent(context, DonationsListActivity::class.java)
+                    context.startActivity(intent)
 
-            Spacer(modifier = Modifier.width(8.dp))
+                }
+            )
+
+            Donation(
+                bgImage = R.drawable.my_profile,
+                title = "My Profile",
+                onClick = {
+                    context.startActivity(Intent(context, ProfileActivity::class.java))
+
+                }
+            )
 
         }
-
-        Donation(
-            bgImage = R.drawable.live_campaign,
-            title = "Live Campaign",
-            onClick = {
-                context.startActivity(Intent(context, LiveCampaignActivity::class.java))
-            }
-        )
-
-        Donation(
-            bgImage = R.drawable.donation_center,
-            title = "Donation center",
-            onClick = {
-                val intent = Intent(context, LocateDonationCentersActivity::class.java)
-                context.startActivity(intent)
-
-            }
-        )
-        Donation(
-            bgImage = R.drawable.my_donation,
-            title = "My Donation",
-            onClick = {
-                val intent = Intent(context, DonationsListActivity::class.java)
-                context.startActivity(intent)
-
-            }
-        )
-
-        Donation(
-            bgImage = R.drawable.my_profile,
-            title = "My Profile",
-            onClick = {
-                context.startActivity(Intent(context, ProfileActivity::class.java))
-
-            }
-        )
-
     }
 }
 

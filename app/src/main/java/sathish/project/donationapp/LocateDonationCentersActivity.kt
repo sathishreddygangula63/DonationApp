@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,6 +60,17 @@ fun LocateDonationCentersScreen(onBack: () -> Unit) {
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+
+    var showFavouritesOnly by remember { mutableStateOf(false) }
+
+
+    val visibleCenters = remember(centers, showFavouritesOnly) {
+        if (!showFavouritesOnly) centers
+        else centers.filter {
+            FavouriteCentersPrefs.isFavourite(context, it.id)
+        }
+    }
+
 
     // 🔹 Fetch donation center data
     LaunchedEffect(Unit) {
@@ -117,11 +130,25 @@ fun LocateDonationCentersScreen(onBack: () -> Unit) {
                     .fillMaxSize()
                     .padding(padding)
             ) {
+
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                 ) {
-                    centers.forEach { center ->
+//                    centers.forEach { center ->
+//                        Marker(
+//                            state = MarkerState(LatLng(center.latitude, center.longitude)),
+//                            title = center.name,
+//                            snippet = center.address,
+//                            onClick = {
+//                                selectedCenter = center
+//                                coroutineScope.launch { sheetState.show() }
+//                                true
+//                            }
+//                        )
+//                    }
+
+                    visibleCenters.forEach { center ->
                         Marker(
                             state = MarkerState(LatLng(center.latitude, center.longitude)),
                             title = center.name,
@@ -133,6 +160,27 @@ fun LocateDonationCentersScreen(onBack: () -> Unit) {
                             }
                         )
                     }
+
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                        .background(Color.White, RoundedCornerShape(50))
+                        .padding(6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (showFavouritesOnly) "⭐ Favourite Centers" else "🏥 All Centers",
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Switch(
+                        checked = showFavouritesOnly,
+                        onCheckedChange = { showFavouritesOnly = it }
+                    )
                 }
 
                 // 🔹 Bottom Sheet
@@ -160,8 +208,86 @@ fun LocateDonationCentersScreen(onBack: () -> Unit) {
     }
 }
 
+
+
 @Composable
 fun DonationCenterDetails(center: DonationCenter, onClose: () -> Unit) {
+    val context = LocalContext.current
+    var isFavourite by remember {
+        mutableStateOf(FavouriteCentersPrefs.isFavourite(context, center.id))
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+
+        Box {
+            AsyncImage(
+                model = center.image,
+                contentDescription = center.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+            )
+
+            IconButton(
+                onClick = {
+                    FavouriteCentersPrefs.toggleFavourite(context, center.id)
+                    isFavourite = !isFavourite
+                },
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = if (isFavourite)
+                        Icons.Default.Favorite
+                    else
+                        Icons.Default.FavoriteBorder,
+                    contentDescription = "Favourite",
+                    tint = Color.Red
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(center.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(center.address, color = Color.Gray)
+        Text("📞 ${center.contact}", color = Color(0xFF4CAF50))
+
+        Spacer(Modifier.height(10.dp))
+        Text(center.info)
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${center.contact}"))
+                context.startActivity(intent)
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.fillMaxWidth().height(50.dp)
+        ) {
+            Text("📞 Call Now", color = Color.White, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedButton(
+            onClick = onClose,
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.fillMaxWidth().height(48.dp)
+        ) {
+            Text("Close")
+        }
+    }
+}
+
+
+@Composable
+fun DonationCenterDetailsOld(center: DonationCenter, onClose: () -> Unit) {
     val context = LocalContext.current
 
     Column(

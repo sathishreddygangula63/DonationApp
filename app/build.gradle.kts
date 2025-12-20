@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.foundation)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -132,8 +133,11 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended")
 
-    implementation("com.google.maps.android:maps-compose:2.11.5")
+//    implementation("com.google.maps.android:maps-compose:2.11.5")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.firebase:firebase-database:21.0.0")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.maps.android:maps-compose:4.3.0")
 
 }

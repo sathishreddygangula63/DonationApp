@@ -51,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -58,6 +59,20 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.jvm.java
+
+
+data class CampaignItem(
+    val item_name: String = "",
+    val quantity: String = ""
+)
+
+
+enum class CampaignType {
+    fund,
+    item
+}
+
 
 data class Campaign(
     val id: String = "",
@@ -65,12 +80,32 @@ data class Campaign(
     val summary: String = "",
     val image: String = "",
     val location: String = "",
+    val category: String = "",
+    val start_date: String = "",
+    val end_date: String = "",
+    val status: String = "",
+
+    // 🔹 ENUM (matches Firebase exactly)
+    val campaign_type: CampaignType = CampaignType.fund,
+
+    // 🔹 Fund specific
     val goal_amount: Double = 0.0,
     val raised_amount: Double = 0.0,
-    val campaign_url: String = "",
-    val category: String = "",
-    val end_date: String = ""
+
+    // 🔹 Item specific
+    val drop_location: String = "",
+    val items_required: List<ItemRequirement> = emptyList(),
+    val items_collected: List<ItemRequirement> = emptyList()
 )
+
+
+
+data class ItemRequirement(
+    val item_name: String = "",
+    val quantity: String = ""
+)
+
+
 
 class LiveCampaignActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +126,8 @@ fun LiveCampaignScreen(onBack: () -> Unit) {
     var selectedCategory by remember { mutableStateOf("All") }
 
     val database = FirebaseDatabase.getInstance().getReference("Campaigns")
+
+
 
     // 🔹 Fetch Data from Firebase
     LaunchedEffect(Unit) {
@@ -211,17 +248,21 @@ fun LiveCampaignScreen(onBack: () -> Unit) {
                     filteredCampaigns.forEach { campaign ->
                         CampaignCard(
                             campaign = campaign,
-                            onDonateClick = {
-                                val intent = Intent(context, DonateNowActivity::class.java).apply {
-                                    putExtra("campaign_id", campaign.id)
-                                    putExtra("campaign_title", campaign.title)
-                                    putExtra("campaign_image", campaign.image)
-                                    putExtra("raised_amount", campaign.raised_amount)
-                                    putExtra("goal_amount", campaign.goal_amount)
-                                }
-                                context.startActivity(intent)
+                            onDonateMoney = {
+                                context.startActivity(
+                                    Intent(context, DonateNowActivity::class.java)
+                                        .putExtra("campaign_id", campaign.id)
+                                )
+                            },
+                            onPickupRequest = {
+                                context.startActivity(
+                                    Intent(context, PickupRequestActivity::class.java)
+                                        .putExtra("campaign_id", campaign.id)
+                                        .putExtra("campaign_title", campaign.title)
+                                )
                             }
                         )
+
                     }
 
                     if (filteredCampaigns.isEmpty()) {
@@ -241,7 +282,153 @@ fun LiveCampaignScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun CampaignCard(campaign: Campaign, onDonateClick: () -> Unit) {
+fun CampaignCard(
+    campaign: Campaign,
+    onDonateMoney: () -> Unit,
+    onPickupRequest: () -> Unit
+) {
+    val isFundCampaign = campaign.campaign_type == CampaignType.fund
+
+    val progress = remember(campaign.raised_amount, campaign.goal_amount) {
+        if (campaign.goal_amount > 0) {
+            (campaign.raised_amount / campaign.goal_amount)
+                .toFloat()
+                .coerceIn(0f, 1f)
+        } else 0f
+    }
+
+    Card(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.background(Color.White)) {
+
+            // 🔹 IMAGE WITH CAMPAIGN TYPE BADGE
+            Box {
+                AsyncImage(
+                    model = campaign.image,
+                    contentDescription = campaign.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+
+                // 🔹 Campaign Type Badge (Top Right)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(10.dp)
+                        .background(
+                            color = if (isFundCampaign)
+                                Color(0xFFFF9800)
+                            else
+                                Color(0xFF4CAF50),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = if (isFundCampaign) "FUND" else "ITEM",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = campaign.title,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            Text(
+                text = "📍 ${campaign.location}",
+                color = Color.Gray,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            Text(
+                text = campaign.summary,
+                modifier = Modifier.padding(12.dp),
+                color = Color.DarkGray
+            )
+
+            // 🔹 FUND CAMPAIGN UI
+            if (isFundCampaign) {
+                LinearProgressIndicator(
+                    progress = progress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .height(6.dp),
+                    color = Color(0xFF4CAF50)
+                )
+
+                Text(
+                    text = "£${campaign.raised_amount} raised of £${campaign.goal_amount}",
+                    color = Color.Gray,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+
+            // 🔹 ITEM CAMPAIGN UI
+            if (!isFundCampaign && campaign.items_required.isNotEmpty()) {
+                Text(
+                    text = "Items Needed:",
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+
+                campaign.items_required.take(3).forEach { item ->
+                    Text(
+                        text = "• ${item.item_name} (${item.quantity})",
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = Color.DarkGray
+                    )
+                }
+
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // 🔹 DONATE BUTTON
+            Button(
+                onClick = {
+                    if (isFundCampaign) onDonateMoney() else onPickupRequest()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+                    .height(44.dp),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFundCampaign)
+                        Color(0xFFFF9800)
+                    else
+                        Color(0xFF4CAF50)
+                )
+            ) {
+                Text(
+                    text = if (isFundCampaign) "Donate Funds" else "Donate Items",
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun CampaignCardOld(campaign: Campaign, onDonateClick: () -> Unit) {
     val endDateFormatted = try {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val date = sdf.parse(campaign.end_date)

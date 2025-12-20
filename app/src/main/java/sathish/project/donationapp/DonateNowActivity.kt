@@ -30,12 +30,36 @@ import coil.compose.AsyncImage
 import com.google.firebase.database.FirebaseDatabase
 import kotlin.math.roundToInt
 
+//data class DonationInfo(
+//    val donorName: String = "",
+//    val amount: Double = 0.0,
+//    val campaignId: String = "",
+//    val timestamp: Long = System.currentTimeMillis()
+//)
+
+//data class DonationInfo(
+//    val donationId: String = "",
+//    val campaignId: String = "",
+//    val donorName: String = "",
+//    val amount: Double = 0.0,
+//    val timestamp: Long = System.currentTimeMillis()
+//)
+
 data class DonationInfo(
+    val donationId: String = "",
     val donorName: String = "",
-    val amount: Double = 0.0,
+    val donorEmail: String = "",
     val campaignId: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val campaignTitle: String = "",
+    val amount: Double = 0.0,
+    val type: String = "fund", // fund / item
+    val timestamp: Long = System.currentTimeMillis(),
+    val status: String = "SUCCESS"
+
 )
+
+
+
 
 class DonateNowActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -190,14 +214,25 @@ fun DonateNowScreen(
 
                         isLoading = true
 
-                        val donationRef = FirebaseDatabase.getInstance().getReference("Donations").push()
+//                        val userEmail = FirebaseAuth.getInstance().currentUser?.email
+//                            ?.replace(".", "_")
+//                            ?: return@Button
+
+                        val userEmail = UserPrefs.getEmail(context).replace(".", "_")
+
+                        val donationRef = FirebaseDatabase.getInstance()
+                            .getReference("Donations")
+                            .child(userEmail)
+                            .push()
+
                         val donationInfo = DonationInfo(
+                            donationId = donationRef.key!!,
                             donorName = donorName,
                             amount = donationAmount,
+                            campaignTitle = title,
                             campaignId = campaignId
                         )
 
-                        // Update raised amount
                         database.child(campaignId).get().addOnSuccessListener { snapshot ->
                             val campaign = snapshot.getValue(Campaign::class.java)
                             if (campaign != null) {
@@ -206,17 +241,11 @@ fun DonateNowScreen(
                                 donationRef.setValue(donationInfo)
 
                                 Toast.makeText(context, "Donation successful 💝", Toast.LENGTH_SHORT).show()
-                                Log.d("DonationApp", "✅ Donation recorded: $donationInfo")
                                 onBack()
-                            } else {
-                                Toast.makeText(context, "Campaign not found", Toast.LENGTH_SHORT).show()
                             }
                             isLoading = false
-                        }.addOnFailureListener { e ->
-                            Log.e("DonationApp", "❌ Error updating donation: ${e.message}")
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                            isLoading = false
                         }
+
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
                     shape = RoundedCornerShape(50),
