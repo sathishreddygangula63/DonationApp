@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "113972816537",
+    "firebase_url": "https://donationapp-5d743-default-rtdb.firebaseio.com",
     "project_id": "donationapp-5d743",
     "storage_bucket": "donationapp-5d743.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:113972816537:android:f385b4541ad94005c2a608",
+        "mobilesdk_app_id": "1:113972816537:android:0ddd6425d0e853f9c2a608",
         "android_client_info": {
-          "package_name": "sathish.project.donationapp"
+          "package_name": "project.donationapp.s3342816sathishreddy"
         }
       },
       "oauth_client": [],

@@ -1,5 +1,3 @@
-import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -10,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "sathish.project.donationapp"
+    namespace = "project.donationapp.s3342816sathishreddy"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "sathish.project.donationapp"
+        applicationId = "project.donationapp.s3342816sathishreddy"
         minSdk = 25
         targetSdk = 36
         versionCode = 1
