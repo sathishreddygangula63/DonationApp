@@ -248,6 +248,10 @@ fun LiveCampaignScreen(onBack: () -> Unit) {
                                 context.startActivity(
                                     Intent(context, DonateNowActivity::class.java)
                                         .putExtra("campaign_id", campaign.id)
+                                        .putExtra("campaign_title",campaign.title)
+                                        .putExtra("campaign_image", campaign.image)
+                                        .putExtra("raised_amount", campaign.raised_amount)
+                                        .putExtra("goal_amount", campaign.goal_amount)
                                 )
                             },
                             onPickupRequest = {
